@@ -30,6 +30,14 @@
   integration changes.
 - Do not leave docs describing removed or outdated behaviour.
 
+## Git and pull requests
+
+- Always create a new feature branch from an up-to-date `main` before making
+  changes. Do not commit on `main` or on an unrelated existing branch.
+- Open changes as a pull request. Fill in
+  [`.github/pull_request_template.md`](.github/pull_request_template.md)
+  completely; do not leave the template blank or omit sections.
+
 ## Commit messages
 
 - Summarize the change in a subject of about 50 characters or fewer.
