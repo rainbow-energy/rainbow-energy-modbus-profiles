@@ -988,6 +988,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: battery_restart_capacity
     name: Battery Restart Capacity
@@ -997,6 +1000,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: battery_low_capacity
     name: Battery Low Capacity
@@ -1006,6 +1012,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: battery_shutdown_voltage
     name: Battery Shutdown Voltage
@@ -1087,6 +1096,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: prog1_voltage
     name: Prog1 Voltage
@@ -1114,6 +1126,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: prog2_voltage
     name: Prog2 Voltage
@@ -1141,6 +1156,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: prog3_voltage
     name: Prog3 Voltage
@@ -1168,6 +1186,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: prog4_voltage
     name: Prog4 Voltage
@@ -1195,6 +1216,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: prog5_voltage
     name: Prog5 Voltage
@@ -1222,6 +1246,9 @@ registers:
     scale: 1
     unit: "%"
     access: write
+    min: 0
+    max: 100
+    step: 1
 
   - key: prog6_voltage
     name: Prog6 Voltage
