@@ -5,29 +5,34 @@ device model and how to decode its Modbus registers into named measurements.
 
 ## Where profiles live
 
-| Location | Purpose |
-|----------|---------|
-| [`profiles/`](profiles/) | Supported register maps. Validated in CI. |
+Device register maps are maintained in
+[rainbow-energy-modbus-profiles](https://github.com/rainbow-energy/rainbow-energy-modbus-profiles).
+This package does not ship YAML maps; load a file from disk:
 
-This repository is the canonical source for community-maintained maps.
+```python
+from rainbow_energy_modbus_client.profiles import load_profile
+
+profile = load_profile("path/to/sunsynk_8k_sg05lp1.yaml")
+```
 
 Validate a profile (schema, overlaps, and decode support):
 
 ```bash
-make check
-# or one file:
-make check-profile PROFILE=profiles/sunsynk_8k_sg05lp1.yaml
+rainbow-energy-modbus-client check-profile path/to/profile.yaml
+# or during development:
+make check-profile PROFILE=path/to/profile.yaml
 ```
 
 Exit codes: `0` supported, `1` unsupported features, `2` load/schema error.
 
 ## Creating a new profile
 
-1. Copy an existing profile or fork `profiles/` from another device map.
+1. Copy an existing map from the profiles repository or start a new YAML file.
 2. Set top-level `manufacturer`, `model`, and `registers`.
 3. Add one entry per named value (leaf Modbus register or math sensor).
-4. Run `make check` until profiles exit `0`.
-5. Open a pull request; CI must pass before merge.
+4. Run `make check-profile PROFILE=...` until it exits `0`.
+5. Open a pull request against
+   [rainbow-energy-modbus-profiles](https://github.com/rainbow-energy/rainbow-energy-modbus-profiles).
 
 Keep **one clear meaning per address** (except disjoint `bitmask`s on the same
 word). Do not ship conflicting aliases for the same register.
@@ -74,6 +79,7 @@ Also require `address`, `function`, and `scale`:
 | `count` | Word count (fixed for most types; required for `string`, `fault`, and `datetime`) |
 | `word_order` | `big` or `little` (required for 32-bit types) |
 | `offset` | Optional; applied after scale: `(raw * scale) - offset` |
+| `min` / `max` / `step` | Optional engineering bounds for UIs and write validation |
 | `bitmask` | Optional; AND each word before typed decode |
 | `options` | Optional; map integer → label string |
 | `binary` | Optional; `true` → nonzero (after mask) is `True` |
@@ -81,6 +87,12 @@ Also require `address`, `function`, and `scale`:
 
 Decode order for leaf registers: **bitmask → typed raw → options or binary or
 (scale then offset)**.
+
+Encode for writes inverts that path: **options/binary/time/datetime or
+(offset then inverse scale) → words**. Bitmasked writes read the current
+holding word, clear the masked bits, OR in the encoded contribution, then
+write the full word. Only `access: write` holding leaf registers are
+writable; math and `access: read` keys are rejected.
 
 ### Math registers
 
@@ -268,6 +280,19 @@ After scale: `(raw * scale) - offset`. Useful for temperatures encoded with a
 bias (for example `offset: 100`). Not allowed with `string`, `fault`,
 `datetime`, `options`, `binary`, or `math`.
 
+### `min` / `max` / `step`
+
+Optional engineering-unit bounds for a numeric register (for example Home
+Assistant number discovery, or tighter write checks than the raw word
+width). Each field is optional; when both `min` and `max` are set,
+`max` must be `>= min`. `step` must be greater than zero.
+
+```yaml
+    min: 0
+    max: 100
+    step: 1
+```
+
 ### `bitmask`
 
 `raw = word & bitmask` before typed decode. Only on single-word numeric types
@@ -334,7 +359,7 @@ These appear in some community maps but are not expressible in Rainbow Energy Mo
 - Nested math sources
 - Explicit binary `on` values (only nonzero-after-mask)
 
-Run `check-profile` on a feature branch while exploring those gaps.
+Run `make check-profile PROFILE=path/to/file.yaml` while exploring those gaps.
 
 ## Minimal example
 
